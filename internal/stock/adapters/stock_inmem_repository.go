@@ -1,0 +1,52 @@
+package adapters
+
+import (
+	"github.com/Hypocrite/gorder/common/genproto/orderpb"
+	domain "github.com/Hypocrite/gorder/stock/domain/stock"
+
+	_ "github.com/sirupsen/logrus"
+
+	"context"
+	"sync"
+)
+
+type MemoryStockRepository struct {
+	lock  *sync.RWMutex
+	store map[string]*orderpb.Item
+}
+
+var stub = map[string]*orderpb.Item{
+	"item_id": {
+		ID:       "foo_item",
+		Name:     "stub_item",
+		Quantity: 10000,
+		PriceID:  "stub_item_price_id",
+	},
+}
+
+func NewMemoryStockRepository() *MemoryStockRepository {
+	return &MemoryStockRepository{
+		lock:  &sync.RWMutex{},
+		store: stub,
+	}
+}
+
+func (m MemoryStockRepository) GetItems(_ context.Context, ids []string) ([]*orderpb.Item, error) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	var (
+		res     []*orderpb.Item
+		missing []string
+	)
+
+	for _, id := range ids {
+		if item, exist := m.store[id]; exist {
+			res = append(res, item)
+		}
+	}
+	if len(res) == len(ids) {
+		return res, nil
+	}
+
+	return res, domain.NotFoundError{Missing: missing}
+}
