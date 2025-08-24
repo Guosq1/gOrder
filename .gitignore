@@ -2,6 +2,6 @@
 ./internal/order/tmp/
 ./internal/stock/tmp/
 ./internal/payment/tmp/
-./internal/kitchen/tmp/
+./internal/kitchenw/tmp/
 *.png
 .md
