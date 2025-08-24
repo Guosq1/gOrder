@@ -2,8 +2,11 @@ package ports
 
 import (
 	"context"
+
 	"github.com/Hypocrite/gorder/common/genproto/stockpb"
+	"github.com/Hypocrite/gorder/common/tracing"
 	"github.com/Hypocrite/gorder/stock/app"
+	"github.com/Hypocrite/gorder/stock/app/query"
 )
 
 type GRPCServer struct {
@@ -15,11 +18,29 @@ func NewGRPCServer(app app.Application) *GRPCServer {
 }
 
 func (G GRPCServer) GetItems(ctx context.Context, req *stockpb.GetItemsReq) (*stockpb.GetItemsRes, error) {
-	//TODO implement me
-	panic("implement me")
+
+	_, span := tracing.Start(ctx, "GetItems")
+	defer span.End()
+
+	items, err := G.app.Queries.GetItems.Handle(ctx, query.GetItems{ItemIDs: req.ItemIDs})
+	if err != nil {
+		return nil, err
+	}
+	return &stockpb.GetItemsRes{Items: items}, nil
 }
 
 func (G GRPCServer) CheckIfItemInStock(ctx context.Context, req *stockpb.CheckIfItemInStockReq) (*stockpb.CheckIfItemInStockRes, error) {
-	//TODO implement me
-	panic("implement me")
+
+	_, span := tracing.Start(ctx, "CheckIfItemInStock")
+	defer span.End()
+
+	items, err := G.app.Queries.CheckIfItemsInStock.Handle(ctx, query.CheckIfItemsInStock{Items: req.Items})
+	if err != nil {
+		return nil, err
+	}
+
+	return &stockpb.CheckIfItemInStockRes{
+		InStock: 1,
+		Items:   items,
+	}, nil
 }

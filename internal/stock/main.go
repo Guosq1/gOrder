@@ -4,8 +4,11 @@ import (
 	"context"
 
 	"github.com/Hypocrite/gorder/common/config"
+	"github.com/Hypocrite/gorder/common/discovery"
 	"github.com/Hypocrite/gorder/common/genproto/stockpb"
+	"github.com/Hypocrite/gorder/common/logging"
 	"github.com/Hypocrite/gorder/common/server"
+	"github.com/Hypocrite/gorder/common/tracing"
 	"github.com/Hypocrite/gorder/stock/ports"
 	"github.com/Hypocrite/gorder/stock/service"
 	"github.com/sirupsen/logrus"
@@ -14,6 +17,7 @@ import (
 )
 
 func init() {
+	logging.Init()
 	if err := config.NewViperConfig(); err != nil {
 		logrus.Fatal(err)
 	}
@@ -27,7 +31,21 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	shutdown, err := tracing.InitJaegerProvider(viper.GetString("jaeger.url"), serviceName)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer shutdown(ctx)
+
 	application := service.NewApplication(ctx)
+	deregisterFunc, err := discovery.RegisterToConsul(ctx, serviceName)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	defer func() {
+		_ = deregisterFunc()
+	}()
 
 	switch serverType {
 	case "grpc":

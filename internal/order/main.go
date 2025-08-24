@@ -3,9 +3,14 @@ package main
 import (
 	"context"
 
+	"github.com/Hypocrite/gorder/common/broker"
 	"github.com/Hypocrite/gorder/common/config"
+	"github.com/Hypocrite/gorder/common/discovery"
 	"github.com/Hypocrite/gorder/common/genproto/orderpb"
+	"github.com/Hypocrite/gorder/common/logging"
 	"github.com/Hypocrite/gorder/common/server"
+	"github.com/Hypocrite/gorder/common/tracing"
+	"github.com/Hypocrite/gorder/order/infrastructure/consumer"
 	"github.com/Hypocrite/gorder/order/ports"
 	"github.com/Hypocrite/gorder/order/service"
 	"github.com/gin-gonic/gin"
@@ -15,6 +20,7 @@ import (
 )
 
 func init() {
+	logging.Init()
 	if err := config.NewViperConfig(); err != nil {
 		logrus.Fatal(err)
 	}
@@ -27,7 +33,36 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	application := service.NewApplication(ctx)
+	shutdown, err := tracing.InitJaegerProvider(viper.GetString("jaeger.url"), serviceName)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer shutdown(ctx)
+
+	application, cleanup := service.NewApplication(ctx)
+	defer cleanup()
+
+	deregisterFunc, err := discovery.RegisterToConsul(ctx, serviceName)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	defer func() {
+		_ = deregisterFunc()
+	}()
+
+	ch, closeCH := broker.Connect(
+		viper.GetString("rabbitmq.user"),
+		viper.GetString("rabbitmq.password"),
+		viper.GetString("rabbitmq.host"),
+		viper.GetString("rabbitmq.port"),
+	)
+	defer func() {
+		_ = ch.Close()
+		_ = closeCH()
+	}()
+
+	go consumer.NewConsumer(application).Listen(ch)
 
 	go server.RunGRPCServer(serviceName, func(server *grpc.Server) {
 		svc := ports.NewGRPCServer(application)
@@ -35,6 +70,8 @@ func main() {
 	})
 
 	server.RunHTTpServer(serviceName, func(router *gin.Engine) {
+		router.StaticFile("/success", "../../public/success.html")
+
 		ports.RegisterHandlersWithOptions(router, HTTPServer{
 			app: application,
 		}, ports.GinServerOptions{

@@ -1,14 +1,39 @@
 fallback-grpc-addr: 127.0.0.1:1122
 
+dial-grpc-timeout: 10
+
+jaeger:
+  url: "http://127.0.0.1:14268/api/traces"
+
+consul:
+  addr: 127.0.0.1:8500
+
 order:
   service-name: order
   server-to-run: http
   http-addr: 127.0.0.1:7777
   grpc-addr: 127.0.0.1:5002
 
-
 stock:
   service-name: stock
   server-to-run: grpc
   http-addr: 127.0.0.1:8888
   grpc-addr: 127.0.0.1:5003
+
+rabbitmq:
+  user: guest
+  password: guest
+  host: 127.0.0.1
+  port: 5672
+  max-retry: 3
+
+
+payment:
+  service-name: payment
+  server-to-run: http
+  http-addr: 127.0.0.1:6666
+  grpc-addr: 127.0.0.1:5004
+
+endpoint-stripe-secret: "${END_STRIPE_SECRET}"
+
+stripe-key: "${STRIPE_KEY}"

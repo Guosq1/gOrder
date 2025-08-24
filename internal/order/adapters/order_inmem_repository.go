@@ -18,13 +18,23 @@ type MemoryOrderRepository struct {
 }
 
 func NewMemoryOrderRepository() *MemoryOrderRepository {
+	s := make([]*domain.Order, 0)
+	s = append(s, &domain.Order{
+		ID:          "fake-ID",
+		CustomerID:  "fake-CustomerID",
+		Status:      "fake-Status",
+		PaymentLink: "fake-PaymentLink",
+		Items:       nil,
+	})
+
 	return &MemoryOrderRepository{
 		lock:  &sync.RWMutex{},
-		store: make([]*domain.Order, 0),
+		store: s,
 	}
 }
 
-func (m MemoryOrderRepository) Create(_ context.Context, order *domain.Order) (*domain.Order, error) {
+func (m *MemoryOrderRepository) Create(_ context.Context, order *domain.Order) (*domain.Order, error) {
+
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	NewOrder := &domain.Order{
@@ -38,11 +48,11 @@ func (m MemoryOrderRepository) Create(_ context.Context, order *domain.Order) (*
 	logrus.WithFields(logrus.Fields{
 		"input_order":        order,
 		"store_after_create": m.store,
-	}).Debug("memory_order_repo_create")
+	}).Info("memory_order_repo_create")
 	return NewOrder, nil
 }
 
-func (m MemoryOrderRepository) Get(_ context.Context, id, customerID string) (*domain.Order, error) {
+func (m *MemoryOrderRepository) Get(_ context.Context, id, customerID string) (*domain.Order, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	for _, order := range m.store {
@@ -54,15 +64,15 @@ func (m MemoryOrderRepository) Get(_ context.Context, id, customerID string) (*d
 	return nil, domain.NotFoundError{OrderID: id}
 }
 
-func (m MemoryOrderRepository) Update(ctx context.Context, o *domain.Order, updateFn func(context.Context, *domain.Order) (*domain.Order, error)) error {
+func (m *MemoryOrderRepository) Update(ctx context.Context, o *domain.Order, updateFn func(context.Context, *domain.Order) (*domain.Order, error)) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-
+	logrus.Debug("store: %v", m.store)
 	found := false
 	for i, order := range m.store {
 		if o.ID == order.ID && o.CustomerID == order.CustomerID {
 			found = true
-			updatedOrder, err := updateFn(ctx, order)
+			updatedOrder, err := updateFn(ctx, o)
 			if err != nil {
 				return err
 			}

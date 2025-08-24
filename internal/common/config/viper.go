@@ -1,11 +1,18 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"strings"
+
+	"github.com/spf13/viper"
+)
 
 func NewViperConfig() error {
 	viper.SetConfigName("global")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("../common/config")
+	viper.AddConfigPath("../config")
+	viper.EnvKeyReplacer(strings.NewReplacer("-", "_"))
+	_ = viper.BindEnv("stripe-key", "STRIPE_KEY", "endpoint-stripe-secret", "END_STRIPE_SECRET")
 	viper.AutomaticEnv()
 	return viper.ReadInConfig()
 }
