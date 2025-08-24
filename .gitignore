@@ -1,5 +1,7 @@
 .idea/
 ./internal/order/tmp/
 ./internal/stock/tmp/
+./internal/payment/tmp/
+./internal/kitchen/tmp/
 *.png
 .md
