@@ -62,7 +62,7 @@ func (r *OrderRepositoryMongo) logWithTag(tag string, err error, result interfac
 	if err != nil {
 		l.Infof("%s_failed", tag)
 	} else {
-		l.Info("%s_success", tag)
+		l.Infof("%s_success", tag)
 	}
 }
 

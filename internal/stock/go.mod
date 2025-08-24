@@ -8,6 +8,7 @@ require (
 	github.com/Hypocrite/gorder/common v0.0.0-00010101000000-000000000000
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
+	github.com/stripe/stripe-go/v82 v82.4.1
 	google.golang.org/grpc v1.73.0
 )
 

@@ -71,11 +71,10 @@ func (h *PaymentHandler) handleWebhook(c *gin.Context) {
 			_ = json.Unmarshal([]byte(session.Metadata["items"]), &items)
 
 			marshalledOrder, err := json.Marshal(&domain.Order{
-				ID:          session.Metadata["orderID"],
-				CustomerID:  session.Metadata["customerID"],
-				Status:      string(stripe.CheckoutSessionPaymentStatusPaid),
-				PaymentLink: session.Metadata["paymentLink"],
-				Items:       items,
+				ID:         session.Metadata["orderID"],
+				CustomerID: session.Metadata["customerID"],
+				Status:     string(stripe.CheckoutSessionPaymentStatusPaid),
+				Items:      items,
 			})
 
 			if err != nil {

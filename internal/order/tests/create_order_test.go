@@ -33,7 +33,11 @@ func TestCreateOrder_success(t *testing.T) {
 		CustomerId: "123",
 		Items: []sw.ItemWithQuantity{
 			{
-				Id:       "test1",
+				Id:       "prod_SvUtpxV5be9KmM",
+				Quantity: 1,
+			},
+			{
+				Id:       "prod_SvUYSv739cprIh",
 				Quantity: 1,
 			},
 		},
@@ -49,7 +53,15 @@ func TestCreateOrder_invalidParams(t *testing.T) {
 		CustomerId: "123",
 		Items: []sw.ItemWithQuantity{
 			{
-				Id:       "test1",
+				Id:       "prod_SvUtpxV5be9KmM",
+				Quantity: 1,
+			},
+			{
+				Id:       "prod_SvUYSv739cprIh",
+				Quantity: 1,
+			},
+			{
+				Id:       "prod_SvUYgRlyMkyFB1",
 				Quantity: 1,
 			},
 		},

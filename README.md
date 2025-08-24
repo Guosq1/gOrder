@@ -6,4 +6,3 @@
 6. stripe 
 7. open telemetry jaeger
 8. CQRS
-9. api layer http->api->ordergrpc

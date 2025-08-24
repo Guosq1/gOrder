@@ -83,8 +83,9 @@ func (c createOrderHandler) Handle(ctx context.Context, cmd CrateOrder) (*Create
 	if err != nil {
 		return nil, err
 	}
-	
+
 	marshalledOrder, err := json.Marshal(o)
+
 	if err != nil {
 		return nil, err
 	}

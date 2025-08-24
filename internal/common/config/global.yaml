@@ -20,19 +20,22 @@ stock:
   http-addr: 127.0.0.1:8888
   grpc-addr: 127.0.0.1:5003
 
-rabbitmq:
-  user: guest
-  password: guest
-  host: 127.0.0.1
-  port: 5672
-  max-retry: 3
-
 
 payment:
   service-name: payment
   server-to-run: http
   http-addr: 127.0.0.1:6666
   grpc-addr: 127.0.0.1:5004
+
+kitchen:
+  service-name: kitchen
+
+rabbitmq:
+  user: guest
+  password: guest
+  host: 127.0.0.1
+  port: 5672
+  max-retry: 3
 
 mongo:
   user: root
