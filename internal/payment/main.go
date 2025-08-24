@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hypocrite/gorder/common/broker"
-	"github.com/Hypocrite/gorder/common/config"
+	_ "github.com/Hypocrite/gorder/common/config"
 	"github.com/Hypocrite/gorder/common/logging"
 	"github.com/Hypocrite/gorder/common/server"
 	"github.com/Hypocrite/gorder/common/tracing"
@@ -16,9 +16,7 @@ import (
 
 func init() {
 	logging.Init()
-	if err := config.NewViperConfig(); err != nil {
-		logrus.Fatal(err)
-	}
+
 }
 
 func main() {

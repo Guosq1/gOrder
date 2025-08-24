@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	_ "github.com/Hypocrite/gorder/common/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
 )
 
@@ -17,8 +19,8 @@ const (
 )
 
 var (
-	//maxRetryCount = viper.GetInt64("rabbitmq.max-retry")
-	maxRetryCount int64 = 3
+	maxRetryCount = viper.GetInt64("rabbitmq.max-retry")
+	//maxRetryCount int64 = 3
 )
 
 type RabbitMQHeaderCarrier map[string]interface{}

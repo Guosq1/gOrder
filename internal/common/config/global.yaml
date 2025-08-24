@@ -34,6 +34,14 @@ payment:
   http-addr: 127.0.0.1:6666
   grpc-addr: 127.0.0.1:5004
 
+mongo:
+  user: root
+  password: password
+  host: 127.0.0.1
+  port: 27017
+  db-name: "order"
+  coll-name: "order"
+
 endpoint-stripe-secret: "${END_STRIPE_SECRET}"
 
 stripe-key: "${STRIPE_KEY}"

@@ -75,16 +75,15 @@ func (c createOrderHandler) Handle(ctx context.Context, cmd CrateOrder) (*Create
 		return nil, err
 	}
 
-	o, err := c.orderRepo.Create(ctx, &domain.Order{
-		CustomerID: cmd.CustomerID,
-		Items:      validItems,
-	})
+	pendingOder, err := domain.NewPendingOrder(cmd.CustomerID, validItems)
 	if err != nil {
 		return nil, err
 	}
-
-	//logrus.Infof("create_order_result:%+v", o)
-
+	o, err := c.orderRepo.Create(ctx, pendingOder)
+	if err != nil {
+		return nil, err
+	}
+	
 	marshalledOrder, err := json.Marshal(o)
 	if err != nil {
 		return nil, err
