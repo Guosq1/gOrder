@@ -3,6 +3,7 @@ package common
 import (
 	"net/http"
 
+	"github.com/Hypocrite/gorder/common/handler/errors"
 	"github.com/Hypocrite/gorder/common/tracing"
 	"github.com/gin-gonic/gin"
 )
@@ -24,18 +25,20 @@ func (base *BaseResponse) Response(c *gin.Context, err error, data interface{}) 
 }
 
 func (base *BaseResponse) success(c *gin.Context, data any) {
+	errcode, errmsg := errors.Output(nil)
 	c.JSON(http.StatusOK, response{
-		ErrCode: 0,
-		Message: "success",
+		ErrCode: errcode,
+		Message: errmsg,
 		Data:    data,
 		TraceID: tracing.TraceID(c.Request.Context()),
 	})
 }
 
 func (base *BaseResponse) error(c *gin.Context, err error) {
+	errcode, errmsg := errors.Output(err)
 	c.JSON(http.StatusOK, response{
-		ErrCode: 2,
-		Message: err.Error(),
+		ErrCode: errcode,
+		Message: errmsg,
 		Data:    nil,
 		TraceID: tracing.TraceID(c.Request.Context()),
 	})

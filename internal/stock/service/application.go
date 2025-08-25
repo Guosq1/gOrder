@@ -8,12 +8,14 @@ import (
 	"github.com/Hypocrite/gorder/stock/app"
 	"github.com/Hypocrite/gorder/stock/app/query"
 	"github.com/Hypocrite/gorder/stock/infrastructure/integration"
+	"github.com/Hypocrite/gorder/stock/infrastructure/persistent"
 	"github.com/sirupsen/logrus"
 )
 
 func NewApplication(_ context.Context) app.Application {
 
-	stockRepo := adapters.NewMemoryStockRepository()
+	db := persistent.NewMySQL()
+	stockRepo := adapters.NewMySQLStockRepository(db)
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	stripeApi := integration.NewStripeApi()
 	metricClient := metric.TodoMetrics{}

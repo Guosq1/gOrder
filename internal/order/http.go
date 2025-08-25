@@ -33,6 +33,12 @@ func (H HTTPServer) PostCustomerCustomerIdOrders(c *gin.Context, customerID stri
 	if err := c.ShouldBindJSON(&req); err != nil {
 		return
 	}
+
+	if err = H.validate(req); err != nil {
+		//err = errors.NewWithError(consts.ErrnoRequestValidateError, err)
+		return
+	}
+
 	r, err := H.app.Commands.CreateOrder.Handle(c.Request.Context(), command.CrateOrder{
 		CustomerID: req.CustomerId,
 		Items:      convertor.NewItemWithQuantityConvertor().ClientsToEntities(req.Items),
@@ -70,4 +76,13 @@ func (H HTTPServer) GetCustomerCustomerIdOrdersOrderId(c *gin.Context, customerI
 	}
 
 	resp.Order = convertor.NewOrderConvertor().EntityToClient(o)
+}
+
+func (H HTTPServer) validate(req client.CreateOrderReq) error {
+	for _, v := range req.Items {
+		if v.Quantity <= 0 {
+			return fmt.Errorf("quantity must be positive, got %d from %s", v.Quantity, v.Id)
+		}
+	}
+	return nil
 }

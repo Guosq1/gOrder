@@ -2,6 +2,10 @@
 ./internal/order/tmp/
 ./internal/stock/tmp/
 ./internal/payment/tmp/
-./internal/kitchenw/tmp/
+./internal/kitchen/tmp/
+./data/mysql_data/
+./redis.conf/
 *.png
 .md
+.txt
+.exe
